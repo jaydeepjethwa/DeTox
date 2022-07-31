@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DeTox</title>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Navigation Bar -->
+        <div class="navbar">
+            <a href="/"><img src="{{ url_for('static', path='/images/detox_logo.svg') }}" alt="DeTox"></a>
+            <a href="/home">Home</a>
+            <a href="#">About</a>
+            <a href="#" style="float: right; margin-right: 12px;">Login</a>
+        </div>
+        <!-- Landing Page -->
+        <div class="hero">
+            <div class="bg-left">
+                <img src="{{ url_for('static', path='/images/bg_left.svg') }}" alt="bg">
+            </div>
+            <div class="bg-mid">
+                <img src="{{ url_for('static', path='/images/bg_mid.svg') }}" alt="bg">
+                <p align="center">MAKE YOUR COMMENTS SECTION<br>TOXICITY FREE</p>
+                <a href="/home"><button type="button">Get Started</button></a>
+            </div>
+            <div class="bg-right">
+                <img src="{{ url_for('static', path='/images/bg_right.svg') }}" alt="bg">
+            </div>
+        </div>
+    </body>
+</html>

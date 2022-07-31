@@ -1,4 +1,8 @@
-.env
+# directories / files
+data/
+*.pth
+bert-base-uncased/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

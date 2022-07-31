@@ -1,9 +1,9 @@
-from ... import BertModel, Module, Dropout, Linear
+from . import BertModel, Module, Dropout, Linear, pretrained_path
 
 class DetoxClass(Module):
     def __init__(self):
         super(DetoxClass, self).__init__()
-        self.l1 = BertModel.from_pretrained('models/pretrained/bert-base-uncased')
+        self.l1 = BertModel.from_pretrained(pretrained_path)
         self.l2 = Dropout(0.3)
         self.l3 = Linear(768, 6)
     

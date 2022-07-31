@@ -1,11 +1,11 @@
-from ... import BertTokenizer, DataLoader
-from ..data_class.toxic_class import DetoxDataset
+from . import BertTokenizer, DataLoader, pretrained_path
+from .data_class import DetoxDataset
 
 MAX_LEN = 200
 BATCH_SIZE = 8
-tokenizer = BertTokenizer.from_pretrained('models/pretrained/bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained(pretrained_path)
 
-def data_loader(data):
+async def data_loader(data):
     inference_set = DetoxDataset(data, tokenizer, MAX_LEN)
 
     inference_params = {
