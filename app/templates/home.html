@@ -17,14 +17,14 @@
             <a href="/"><img src="{{ url_for('static', path='/images/detox_logo.svg') }}" alt="DeTox"></a>
             <a href="/home">Home</a>
             <a href="#">About</a>
-            <a href="#" style="float: right; margin-right: 12px;">Login</a>
+            <a href="#" style="float: right; margin-right: 12px;">Welcome, {{ channel_name }}</a>
         </div>
         <div class="hero-home">
             <div class="channels">
                 <p>My Channels</p> 
                 <hr>
-                <a href="#myvideos" data-toggle="tab"><img src="{{ url_for('static', path='/images/clean.svg') }}" alt="channel-logo"> Channel name</p></a>
-                <a href="#myvideos"><img src="{{ url_for('static', path='/images/clean.svg') }}" alt="channel-logo"> Channel name</p></a>
+                <a href="#myvideos" data-toggle="tab"><img src="{{ url_for('static', path='/images/clean.svg') }}" alt="channel-logo"> {{ channel_name }}</p></a>
+                <!-- <a href="#myvideos"><img src="{{ url_for('static', path='/images/clean.svg') }}" alt="channel-logo"> Channel name</p></a> -->
             </div>
         </div>
     </body>

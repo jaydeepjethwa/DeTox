@@ -1,0 +1,1 @@
+from .google_oauth2 import auth_router
