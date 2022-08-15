@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 
 import requests
 from config import credentials_to_dict
@@ -71,6 +71,10 @@ async def oauth2callback(request: Request):
 # revoke permissions granted by the user
 @auth_router.get("/revoke")
 async def revoke(request: Request):
+    # if not logged in login first
+    if "credentials" not in request.session:
+        return HTMLResponse(f"You need to <a href={request.url_for('authorize')}>authorize</a> before testing the code to revoke credentials.")
+    
     # get credentials from session and create google Credentials class
     credentials = google.oauth2.credentials.Credentials(**request.session["credentials"])
     
@@ -90,6 +94,7 @@ async def revoke(request: Request):
 @auth_router.get("/logout")
 async def logout(request: Request):
     # clearing session data for logging out
-    del request.session["credentials"]
+    if "credentials" in request.session:
+        del request.session["credentials"]
     
     return RedirectResponse(request.url_for("landing"))

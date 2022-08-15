@@ -9,26 +9,74 @@ html, body {
 /* Style the navigation bar */
 .navbar {
     width: 100%;
-    height: auto;
     background-color: #00ffd0;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .navbar a {
     float: left;
-    margin-top: 1px;
-    padding: 12px;
+    padding: 14px 16px;
     color: black;
     text-decoration: none;
     font-size: 20px;
+    text-align: center;
 }
   
 .navbar img {
     margin-left: 10px;
     margin-top: -5px;
-    margin-right: 5px;
     float: left;
     height: 36px;
+    vertical-align: middle;
+}
+
+.dropdown {
+    float: right;
+    margin-right: 12px;
+    overflow: hidden;
+}
+
+.dropdown .dropbtn {
+    border: none;
+    outline: none;
+    padding: 14px 16px;
+    background-color: inherit;
+    font-family: inherit; 
+    font-size: 20px;
+    align-items: center;
+    margin: 0;
+}
+
+.dropbtn img {
+    float: right;
+    border-radius: 50%;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    background-color: rgb(235, 254, 245);
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    font-size: 15px;
+}
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
 }
 
 /* Style the Landing page */
@@ -78,13 +126,21 @@ html, body {
     height: 92%;
 }
 
+/* Channel Section*/
 .channel {
     float: left;
-    width: 15%;
+    width: 20%;
     height: 100%;
     background-color:rgb(235, 254, 245);
-    overflow: auto;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.channel img {
+    margin-block-start: 1.5em;
+    border-radius: 50%;
+    height: 20%;
 }
 
 .channel hr {
@@ -94,16 +150,89 @@ html, body {
     background-color: rgb(91, 157, 126);
 }
 
-.channel a {
-    width: 100%;
-    text-decoration: none;
-    color: black;
-    display: inline-block;
-    margin-top: 8px;
+/* Video Section */
+.videos {
+    float: left;
+    width: 80%;
+    height: 100%;
+    background-color:white;
+    overflow: hidden;
+    text-align: center;
 }
 
-.channel img {
-    vertical-align: middle;
-    width: 30px;
-    height: 30px;
+.videos hr {
+    width: 90%;
+    border: none;
+    height:1.5px;
+    background-color: rgb(91, 157, 126);
+}
+
+.video-body {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.video-content {
+    width: 90%;
+    height: 26%;
+    display: flex;
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    box-shadow: 10px 10px 5px rgb(235, 254, 245);
+}
+
+.vid-thumbnail {
+    width: 25%;
+}
+
+.vid-thumbnail img {
+    width: 100%;
+    height: 100%;
+}
+
+.vid-detail {
+    width: 60%;
+    float: left;
+    text-align: left;
+}
+
+.vid-detail p {
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+    margin-inline-start: 1.2em;
+    margin-inline-end: auto;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: lighter;
+}
+
+.vid-detail p.title {
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    margin-inline-start: 1.0em;
+    margin-inline-end: auto;
+    font-size: 18px;
+}
+
+.video-content .button-holder {
+    width: 15%;
+    position: relative;
+}
+
+.video-content .button-holder button {
+    float: none;
+    background-color: #00ffd0;
+    color: black;
+    line-height: 2.5;
+    padding: 0 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    right: 25px;
+    bottom: 25px;
 }

@@ -14,8 +14,8 @@
     <body>
         <!-- Navigation Bar -->
         <div class="navbar">
-            <a href="/"><img src="{{ url_for('static', path='/images/detox_logo.svg') }}" alt="DeTox"></a>
-            <a href="/home">Home</a>
+            <a href="{{ url_for('landing') }}"><img src="{{ url_for('static', path='/images/detox_logo.svg') }}" alt="DeTox"></a>
+            <a href="{{ url_for('home') }}">Home</a>
             <a href="#">About</a>
         </div>
         <!-- Landing Page -->
@@ -26,7 +26,7 @@
             <div class="bg-mid">
                 <img src="{{ url_for('static', path='/images/bg_mid.svg') }}" alt="bg">
                 <p align="center">MAKE YOUR COMMENTS SECTION<br>TOXICITY FREE</p>
-                <a href="/home"><button type="button">Get Started</button></a>
+                <a href="{{ url_for('home') }}"><button type="button">Get Started</button></a>
             </div>
             <div class="bg-right">
                 <img src="{{ url_for('static', path='/images/bg_right.svg') }}" alt="bg">
