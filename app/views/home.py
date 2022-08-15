@@ -1,40 +1,34 @@
 from fastapi import APIRouter, Request
-from starlette.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 
-import google.oauth2.credentials
-import googleapiclient.discovery
+from library.yt_data import fetch_channel_data
 
-from config import templates, credentials_to_dict
+from config import templates
 
 home_view = APIRouter()
-
+from time import time
 
 # home age of the web-app
 @home_view.get("/")
-def home(request: Request):
+async def home(request: Request):
     
     # if not authorized, auhthorize first
     if "credentials" not in request.session:
         return RedirectResponse(request.url_for("authorize"))
     
     
-    # loading credentials from session for youtube api
-    credentials = google.oauth2.credentials.Credentials(**request.session["credentials"])
+    channel_data = await fetch_channel_data(request)
+    print(channel_data)
     
-    API_SERVICE_NAME, API_VERSION = "youtube", "v3"
-    youtube = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
-    channel = youtube.channels().list(mine=True, part='snippet').execute()
-
-    # Save credentials back to session in case access token was refreshed.
-    request.session["credentials"] = credentials_to_dict(credentials)
-    
-    # check if logged in account has youtube channel, temporarily logging out
-    if channel["pageInfo"]["totalResults"] == 0:
-        return RedirectResponse(request.url_for("logout"))
+    channel_name = channel_data["items"][0]["snippet"]["title"]
+    channel_logo_url = channel_data["items"][0]["snippet"]["thumbnails"]["default"]["url"]
+    stats = channel_data["items"][0]["statistics"]
     
     context_dict = {
         "request": request,
-        "channel_name": channel["items"][0]["snippet"]["title"]
+        "channel_name": channel_name,
+        "channel_logo_url": channel_logo_url,
+        "stats": stats
     }
     
     return templates.TemplateResponse("home.html", context=context_dict)

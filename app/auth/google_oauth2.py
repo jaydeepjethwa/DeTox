@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from starlette.responses import RedirectResponse
+from fastapi.responses import RedirectResponse
 
 import requests
 from config import credentials_to_dict
@@ -70,7 +70,6 @@ async def oauth2callback(request: Request):
   
 # revoke permissions granted by the user
 @auth_router.get("/revoke")
-@auth_router.post("/revoke")
 async def revoke(request: Request):
     # get credentials from session and create google Credentials class
     credentials = google.oauth2.credentials.Credentials(**request.session["credentials"])

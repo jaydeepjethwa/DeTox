@@ -26,5 +26,5 @@ def landing(request: Request):
 
 
 # adding various routes to the app
-app.include_router(auth_router, tags=["Google OAuth 2.0"], prefix="/authorize")
+app.include_router(auth_router, tags=["Google OAuth 2.0"], prefix="/auth")
 app.include_router(home_view, tags=["Home"], prefix="/home")

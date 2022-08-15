@@ -78,7 +78,7 @@ html, body {
     height: 92%;
 }
 
-.channels {
+.channel {
     float: left;
     width: 15%;
     height: 100%;
@@ -87,14 +87,14 @@ html, body {
     text-align: center;
 }
 
-.channels hr {
+.channel hr {
     width: 80%;
     border: none;
     height:1.5px;
     background-color: rgb(91, 157, 126);
 }
 
-.channels a {
+.channel a {
     width: 100%;
     text-decoration: none;
     color: black;
@@ -102,8 +102,8 @@ html, body {
     margin-top: 8px;
 }
 
-.channels img {
+.channel img {
     vertical-align: middle;
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
 }
