@@ -2,6 +2,7 @@
 data/
 *.pth
 bert-base-uncased/
+client_secret.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
