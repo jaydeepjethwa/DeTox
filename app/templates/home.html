@@ -18,8 +18,7 @@
             <a href="{{ url_for('home') }}">Home</a>
             <a href="#">About</a>
             <div class="dropdown">
-                <button class="dropbtn">{{ channel_data["name"] }} <img src="{{ channel_data['logo_url'] }}" alt="">
-                </button>
+                <button class="dropbtn">{{ channel_data["name"] }} <img src="{{ channel_data['logo_url'] }}" alt=""></button>
                 <div class="dropdown-content">
                     <a href="{{ url_for('logout') }}">Log Out</a>
                     <a href="{{ url_for('revoke') }}">Revoke Access</a>
@@ -41,23 +40,27 @@
                 <p style="font-size: 20px;">My Videos</p> 
                 <hr>
                 <div class="video-body">
-                    {% for i in range(3) %}
-                    <div class="video-content">
-                        <div class="vid-thumbnail">
-                            <img src="{{ video_data['thumbnail_url'][i] }}" alt="">
+                    {% if video_data|length > 0 %}
+                        {% for video in video_data %}
+                        <div class="video-content">
+                            <div class="vid-thumbnail">
+                                <img src="{{ video['thumbnail_url'] }}" alt="">
+                            </div>
+                            <div class="vid-detail">
+                                <p class="title">{{ video["title"] }}</p>
+                                <p>Views: {{ video["views"] }}</p>
+                                <p>Likes: {{ video["likes"] }}</p>
+                                <p>Comments: {{ video["comments"] }}</p>
+                                <p>Description: {{ video["description"] }}</p>
+                            </div>
+                            <div class="button-holder">
+                                <a href="#"><button type="button">Analyze</button></a>
+                            </div>
                         </div>
-                        <div class="vid-detail">
-                            <p class="title">{{ video_data["title"][i] }}</p>
-                            <p>Views: {{ video_data["views"][i] }}</p>
-                            <p>Likes: {{ video_data["likes"][i] }}</p>
-                            <p>Comments: {{ video_data["comments"][i] }}</p>
-                            <p>Description: {{ video_data["description"][i] }}</p>
-                        </div>
-                        <div class="button-holder">
-                            <a href="#"><button type="button">Analyze</button></a>
-                        </div>
-                    </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: grey;">No Videos Found</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

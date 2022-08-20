@@ -7,6 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from config import templates
 from auth import auth_router
 from views import home_view
+from routes import yt_router
 
 
 # allowing http urls for testing TO BE REMOVED WHILE DEPLOYING
@@ -28,3 +29,4 @@ def landing(request: Request):
 # adding various routes to the app
 app.include_router(auth_router, tags=["Google OAuth 2.0"], prefix="/auth")
 app.include_router(home_view, tags=["Home"], prefix="/home")
+app.include_router(yt_router, tags=["Youtube Data"], prefix="/yt")

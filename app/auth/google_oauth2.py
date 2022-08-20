@@ -2,10 +2,11 @@ from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse, HTMLResponse
 
 import requests
-from config import credentials_to_dict
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
+
+from config import credentials_to_dict
 
 
 # setting up OAuth 2.0 variables
@@ -94,7 +95,6 @@ async def revoke(request: Request):
 @auth_router.get("/logout")
 async def logout(request: Request):
     # clearing session data for logging out
-    if "credentials" in request.session:
-        del request.session["credentials"]
+    request.session.clear()
     
     return RedirectResponse(request.url_for("landing"))
