@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>DeTox - Home</title>
+        <title>DeTox - Video Analysis</title>
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
         <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,39 +27,41 @@
         </div>
         <div class="hero-home">
             <div class="side-bar">
-                <img src="{{ channel_details['logo_url'] }}" alt="">
-                <p style="font-size: 18px;">My Channel</p> 
+                <img src="{{ video['thumbnail_url'] }}" alt="" style="border-radius: 2%; width: 80%; height: auto;">
+                
+                
+                <p style="font-size: 18px;">{{ video["title"] }}</p> 
                 <hr>
-                <p>Video Count: {{ channel_details['stats']["videoCount"] }}</p>
-                <p>Total Views: {{ channel_details['stats']["viewCount"] }}</p>
-                <p>Subscribers: {{ channel_details['stats']["subscriberCount"] }}</p>
+                <p>Views: {{ video["views"] }}</p>
+                <p>Likes: {{ video["likes"] }}</p>
+                <p>Comments: {{ video["comments"] }}</p>
             </div>
             <div class="main-content">
-                <p style="font-size: 20px;">My Videos</p> 
+                <p style="font-size: 20px;">Analysis</p> 
                 <hr>
-                <div class="video-body">
+                <!-- <div class="video-body">
                     {% if video_data|length > 0 %}
-                        {% for video_id in video_data %}
+                        {% for video in video_data %}
                         <div class="video-content">
                             <div class="vid-thumbnail">
-                                <img src="{{ video_data[video_id]['thumbnail_url'] }}" alt="">
+                                <img src="{{ video['thumbnail_url'] }}" alt="">
                             </div>
                             <div class="vid-detail">
-                                <p class="title">{{ video_data[video_id]["title"] }}</p>
-                                <p>Views: {{video_data[video_id]["views"] }}</p>
-                                <p>Likes: {{video_data[video_id]["likes"] }}</p>
-                                <p>Comments: {{video_data[video_id]["comments"] }}</p>
-                                <p>Description: {{video_data[video_id]["description"] }}</p>
+                                <p class="title">{{ video["title"] }}</p>
+                                <p>Views: {{ video["views"] }}</p>
+                                <p>Likes: {{ video["likes"] }}</p>
+                                <p>Comments: {{ video["comments"] }}</p>
+                                <p>Description: {{ video["description"] }}</p>
                             </div>
                             <div class="button-holder">
-                                <a href="{{ url_for('video_analysis', video_id = video_id) }}"><button type="button">Analyze</button></a>
+                                <a href="{{ url_for('video_analysis', video_id = video['id']) }}"><button type="button">Analyze</button></a>
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
                         <p style="color: grey;">No Videos Found</p>
                     {% endif %}
-                </div>
+                </div> -->
             </div>
         </div>
     </body>

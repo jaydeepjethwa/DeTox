@@ -13,7 +13,7 @@ else:
     model.load_state_dict(torch.load(fine_tuned_path, map_location=device))
 
 
-def predict(inference_loader):
+async def predict(inference_loader):
 
     model.eval()
     comment_id = []

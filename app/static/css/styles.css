@@ -127,8 +127,8 @@ html, body {
     height: 92%;
 }
 
-/* Channel Section*/
-.channel {
+/* Side Bar*/
+.side-bar {
     float: left;
     width: 20%;
     height: 100%;
@@ -138,21 +138,26 @@ html, body {
     text-overflow: ellipsis;
 }
 
-.channel img {
+.side-bar img {
     margin-block-start: 2em;
     border-radius: 50%;
     height: 18%;
 }
 
-.channel hr {
+.side-bar hr {
     width: 80%;
     border: none;
     height:1.5px;
     background-color: rgb(91, 157, 126);
 }
 
-/* Video Section */
-.videos {
+.side-bar p {
+    margin-inline-start: 1em;
+    margin-inline-end: 1em;
+}
+
+/* Main Section */
+.main-content {
     float: left;
     width: 80%;
     height: 100%;
@@ -161,7 +166,7 @@ html, body {
     text-align: center;
 }
 
-.videos hr {
+.main-content hr {
     width: 90%;
     border: none;
     height:1.5px;
