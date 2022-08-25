@@ -3,8 +3,14 @@ from .data_class import DetoxDataset
 
 MAX_LEN = 200
 BATCH_SIZE = 8
-tokenizer = BertTokenizer.from_pretrained(pretrained_path)
 
+# load BERT Tokenizer
+def load_tokeninzer():
+    global tokenizer
+    tokenizer = BertTokenizer.from_pretrained(pretrained_path)
+
+
+# creates and returns a data loader object for making predictions in batch
 def data_loader(data):
     inference_set = DetoxDataset(data, tokenizer, MAX_LEN)
 

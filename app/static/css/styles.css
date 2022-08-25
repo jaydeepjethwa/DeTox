@@ -173,6 +173,7 @@ html, body {
     background-color: rgb(91, 157, 126);
 }
 
+/* Video list */
 .video-body {
     width: 100%;
     height: 100%;
@@ -242,4 +243,62 @@ html, body {
     position: absolute;
     right: 10%;
     bottom: 10%;
+}
+
+/* Analysis */
+.analysis-body {
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.analysis-content {
+    width: 100%;
+    height: 65%;
+}
+
+.word-cloud {
+    float: left;
+    text-align: center;
+    align-items: center;
+    width: 50%;
+    height: 100%;
+}
+
+.word-cloud img {
+    width: 80%;
+    height: 85%;
+}
+
+.classification-graph {
+    float: right;
+    text-align: center;
+    align-items: center;
+    width: 50%;
+    height: 100%;
+}
+
+.classification-graph p {
+    margin-left: 2em;
+}
+
+.classification-graph img {
+    width: 82%;
+    height: 90%;
+}
+
+.delete-button {
+    margin-top: 3em;
+    height: 30%;
+}
+
+.delete-button button{
+    vertical-align: middle;
+    border: 0px;
+    background-color: #f44949;
+    color: white;
+    line-height: 2.5;
+    padding: 0 20px;
+    border-radius: 5px;
+    cursor: pointer;
 }

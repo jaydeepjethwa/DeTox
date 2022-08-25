@@ -39,29 +39,22 @@
             <div class="main-content">
                 <p style="font-size: 20px;">Analysis</p> 
                 <hr>
-                <!-- <div class="video-body">
-                    {% if video_data|length > 0 %}
-                        {% for video in video_data %}
-                        <div class="video-content">
-                            <div class="vid-thumbnail">
-                                <img src="{{ video['thumbnail_url'] }}" alt="">
-                            </div>
-                            <div class="vid-detail">
-                                <p class="title">{{ video["title"] }}</p>
-                                <p>Views: {{ video["views"] }}</p>
-                                <p>Likes: {{ video["likes"] }}</p>
-                                <p>Comments: {{ video["comments"] }}</p>
-                                <p>Description: {{ video["description"] }}</p>
-                            </div>
-                            <div class="button-holder">
-                                <a href="{{ url_for('video_analysis', video_id = video['id']) }}"><button type="button">Analyze</button></a>
-                            </div>
+                <div class="analysis-body">
+                    <div class="analysis-content">
+                        <div class="word-cloud">
+                            <p>Comments Summary</p>
+                            <img src="{{ url_for('static', path='/images/word_cloud.png') }}" alt="">
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <p style="color: grey;">No Videos Found</p>
-                    {% endif %}
-                </div> -->
+                        <div class="classification-graph">
+                            <p>Comments Classification</p>
+                            <img src="{{ url_for('static', path='/images/classification_graph.png') }}" alt="">
+                        </div>
+                    </div>
+                    <div class="delete-button">
+                        <a href="#"><button type="button">Delete Comments</button></a>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </body>

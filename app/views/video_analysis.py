@@ -18,12 +18,13 @@ async def video_analysis(request: Request, video_id: str):
     # fetch comments for given video id and form pandas dataframe
     analysis_obj = VideoAnalysis()
     
-    credentials, analysis_obj = await make_comments_dataframe(request.session["credentials"], video_id, analysis_obj)
+    credentials = await make_comments_dataframe(request.session["credentials"], video_id, analysis_obj)
     request.session["credentials"] = credentials
     
     preds = await analysis_obj.classifyComments()
+    await analysis_obj.createWordCloud()
+    await analysis_obj.createClassificationGraph()
     print(preds)
-    
     # try:
     
         
@@ -40,7 +41,7 @@ async def video_analysis(request: Request, video_id: str):
 
 
 # api allows fetching only 100 comments at a time hence repeat to fetch all comments
-async def make_comments_dataframe(credentials, video_id, analysis_obj) -> tuple:
+async def make_comments_dataframe(credentials, video_id, analysis_obj):
     
     comment_response = await fetch_video_comments(credentials, video_id)
     
@@ -50,7 +51,7 @@ async def make_comments_dataframe(credentials, video_id, analysis_obj) -> tuple:
         comment_threads = comment_response["comment_threads"]
         
         for comment in comment_threads["items"]:
-            resp = await analysis_obj.append_comments(
+            await analysis_obj.append_comments(
                 {
                     "id": comment['snippet']['topLevelComment']['id'], 
                     "comment_text": comment['snippet']['topLevelComment']['snippet']['textDisplay']
@@ -63,4 +64,4 @@ async def make_comments_dataframe(credentials, video_id, analysis_obj) -> tuple:
         else:
             break
         
-    return credentials, analysis_obj
+    return credentials
