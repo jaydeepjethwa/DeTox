@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div class="hero-home">
+        <div class="body-content">
             <div class="side-bar">
                 <img src="{{ video['thumbnail_url'] }}" alt="" style="border-radius: 2%; width: 80%; height: auto;">
                 
@@ -43,11 +43,11 @@
                     <div class="analysis-content">
                         <div class="word-cloud">
                             <p>Comments Summary</p>
-                            <img src="{{ url_for('static', path='/images/word_cloud.png') }}" alt="">
+                            <img src="{{ url_for('static', path='/images/word_cloud_'+video['id']+'.png') }}" alt="">
                         </div>
                         <div class="classification-graph">
                             <p>Comments Classification</p>
-                            <img src="{{ url_for('static', path='/images/classification_graph.png') }}" alt="">
+                            <img src="{{ url_for('static', path='/images/classification_graph_'+video['id']+'.png') }}" alt="">
                         </div>
                     </div>
                     <div class="delete-button">

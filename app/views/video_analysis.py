@@ -22,9 +22,9 @@ async def video_analysis(request: Request, video_id: str):
     request.session["credentials"] = credentials
     
     preds = await analysis_obj.classifyComments()
-    await analysis_obj.createWordCloud()
-    await analysis_obj.createClassificationGraph()
-    print(preds)
+    await analysis_obj.createWordCloud(video_id)
+    await analysis_obj.createClassificationGraph(video_id)
+    # print(preds)
     # try:
     
         
@@ -34,7 +34,7 @@ async def video_analysis(request: Request, video_id: str):
     context_dict = {
         "request": request,
         "channel_details": request.session["channel_data"]["channel_details"],
-        "video": request.session["channel_data"]["video_data"][video_id]
+        "video": request.session["channel_data"]["video_data"][video_id],
     }
     
     return templates.TemplateResponse("video_analysis.html", context = context_dict)

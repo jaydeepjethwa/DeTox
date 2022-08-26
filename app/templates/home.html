@@ -10,8 +10,15 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+        <script>    
+            function displayLoader() {
+                document.getElementById("loader").style.display = "block";
+                document.getElementById("body-content").style.display = "none";
+            }
+        </script> 
     </head>
     <body>
+        <div id="loader" class="center"></div>
         <!-- Navigation Bar -->
         <div class="navbar">
             <a href="{{ url_for('landing') }}"><img src="{{ url_for('static', path='/images/detox_logo.svg') }}" alt="DeTox"></a>
@@ -25,7 +32,7 @@
                 </div>
             </div>
         </div>
-        <div class="hero-home">
+        <div id="body-content" class="body-content">
             <div class="side-bar">
                 <img src="{{ channel_details['logo_url'] }}" alt="">
                 <p style="font-size: 18px;">My Channel</p> 
@@ -52,7 +59,7 @@
                                 <p>Description: {{video_data[video_id]["description"] }}</p>
                             </div>
                             <div class="button-holder">
-                                <a href="{{ url_for('video_analysis', video_id = video_id) }}"><button type="button">Analyze</button></a>
+                                <a href="{{ url_for('video_analysis', video_id = video_id) }}"><button type="button" onclick="displayLoader()">Analyze</button></a>
                             </div>
                         </div>
                         {% endfor %}
@@ -61,6 +68,6 @@
                     {% endif %}
                 </div>
             </div>
-        </div>
+        </div> 
     </body>
 </html>
