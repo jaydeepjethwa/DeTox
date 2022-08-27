@@ -1,5 +1,6 @@
 from transformers import BertModel, BertTokenizer
 
+# get pre-trained BERT model and tokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertModel.from_pretrained('bert-base-uncased')
 

@@ -1,9 +1,17 @@
 from . import torch, Dataset
 
-# Creating Dataset and DataLoader for neural net
+
 class DetoxDataset(Dataset):
+    """PyTorch dataset class."""
 
     def __init__(self, dataframe, tokenizer, max_len):
+        """Constructor for class.
+
+        Args:
+            dataframe (pandas DataFrame): DataFrame under consideration for prediction.
+            tokenizer : BERT tokenizer object.
+            max_len (int): Maximum length for sentences.
+        """
         self.tokenizer = tokenizer
         self.data = dataframe
         self.comment_id = dataframe.id
@@ -11,9 +19,22 @@ class DetoxDataset(Dataset):
         self.max_len = max_len
 
     def __len__(self):
+        """
+        Returns:
+            int: Length (instances) of current dataset.
+        """
+        
         return len(self.comment_text)
 
     def __getitem__(self, index):
+        """Returns instance from dataset that is ready to be passed to ml model.
+        Args:
+            index (int): Index of instance to be returned.
+
+        Returns:
+            dict: Dictionary containing comment_id, ids(mappings between tokens and their respective IDs), mask(prevent the model from looking at padding tokens) and token type ids(represents sentence id).
+        """
+        
         comment_text = str(self.comment_text[index])
         comment_text = " ".join(comment_text.split())
 

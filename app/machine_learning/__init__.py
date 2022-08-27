@@ -1,3 +1,5 @@
+"""Machine learning modules helping to predict classes."""
+
 # importing imp libraries
 import torch
 import numpy as np

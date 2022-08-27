@@ -14,23 +14,31 @@ from machine_learning import load_tokeninzer, load_model
 # allowing http urls for testing TO BE REMOVED WHILE DEPLOYING
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-
 # initializing fastapi app, adding static files directory and session middelware for session management
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(SessionMiddleware, secret_key = os.getenv("session_secret"))
 
 
-# load machine learning model on startup to reduce time in making first request
 @app.on_event("startup")
 def startup_event():
+    """Load machine learning model on startup to reduce time in making first request."""
+    
     load_tokeninzer()
     load_model()
 
 
-# landing page of the web-app
 @app.get("/", tags=["Landing Page"])
 def landing(request: Request):
+    """Landing Page of the web-app.
+
+    Args:
+        request (Request): A Request object containing request data sent from client side.
+
+    Returns:
+        TemplateResponse: Home page with context-dict containing necessary data.
+    """
+    
     return templates.TemplateResponse("landing.html", {"request": request})
 
 

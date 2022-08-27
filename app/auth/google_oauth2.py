@@ -6,7 +6,7 @@ import requests
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 
-from config import credentials_to_dict
+from . import credentials_to_dict
 
 
 # setting up OAuth 2.0 variables
@@ -21,10 +21,18 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 auth_router = APIRouter()
 
 
-# creating flow object and initiating authorization process
 @auth_router.get("/")
 async def authorize(request: Request):
-    # flow instance to manage OAuth 2.0 Authorization Grant Flow steps
+    """Initializes authorization process.
+
+    Args:
+        request (Request): A Request object containing request data sent from client side.
+
+    Returns:
+        RedirectResponse: Redirects to google authentication url.
+    """
+    
+    # flow object to manage OAuth 2.0 Authorization Grant Flow steps
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
            CLIENT_SECRETS_FILE, 
            scopes = SCOPES
@@ -44,9 +52,17 @@ async def authorize(request: Request):
     return RedirectResponse(authorization_url)
 
 
-# redirect uri after user authorizes, stores credentials in session
 @auth_router.get("/oauth2callback")
 async def oauth2callback(request: Request):
+    """Redirect Uniform Resource Identifier (URI), called after authorization process. Verifes the authorization state and stores the credentials in session storage.
+
+    Args:
+        request (Request): A Request object containing request data sent from client side.
+
+    Returns:
+        RedirectResponse: Redirects to home page.
+    """
+    
     # specifying state in callback so that it can verify authorization response
     state = request.session["state"]
     
@@ -68,10 +84,18 @@ async def oauth2callback(request: Request):
     
     return RedirectResponse(request.url_for("home"))
   
-  
-# revoke permissions granted by the user
+
 @auth_router.get("/revoke")
 async def revoke(request: Request):
+    """Revokes YouTube account access from the web-app.
+
+    Args:
+        request (Request): A Request object containing request data sent from client side.
+
+    Returns:
+        RedirectResponse: Redirects to logout page for clearing data in session and if failed to revoke redirects back to home page.
+    """
+    
     # if not logged in login first
     if "credentials" not in request.session:
         return HTMLResponse(f"You need to <a href={request.url_for('authorize')}>authorize</a> before testing the code to revoke credentials.")
@@ -80,21 +104,28 @@ async def revoke(request: Request):
     credentials = google.oauth2.credentials.Credentials(**request.session["credentials"])
     
     # revoke accesss
-    revoke = requests.post("https://oauth2.googleapis.com/revoke",
-                          params = {"token": credentials.token},
-                          headers = {"content-type": "application/x-www-form-urlencoded"} 
-                          )
+    response = requests.post("https://oauth2.googleapis.com/revoke",
+        params = {"token": credentials.token},
+        headers = {"content-type": "application/x-www-form-urlencoded"}
+    )
     
-    if revoke.status_code == 200: # if success clear the session i.e. logout
+    if response.status_code == 200: # if success clear the session i.e. logout
         return RedirectResponse(request.url_for("logout"))
     else:
         return RedirectResponse(request.url_for("home"))
     
 
-# logging out user
 @auth_router.get("/logout")
 async def logout(request: Request):
-    # clearing session data for logging out
+    """Logs out the authenticated user by clearing out the session storage.
+
+    Args:
+        request (Request): A Request object containing request data sent from client side.
+
+    Returns:
+        RedirectResponse: Redirects to landing page.
+    """
+    
     request.session.clear()
     
     return RedirectResponse(request.url_for("landing"))

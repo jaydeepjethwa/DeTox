@@ -40,21 +40,24 @@
                 <p style="font-size: 20px;">Analysis</p> 
                 <hr>
                 <div class="analysis-body">
-                    <div class="analysis-content">
-                        <div class="word-cloud">
-                            <p>Comments Summary</p>
-                            <img src="{{ url_for('static', path='/images/word_cloud_'+video['id']+'.png') }}" alt="">
+                    {% if has_comments %}
+                        <div class="analysis-content">
+                            <div class="word-cloud">
+                                <p>Comments Summary</p>
+                                <img src="{{ url_for('static', path='/images/word_cloud_'+video['id']+'.png') }}" alt="">
+                            </div>
+                            <div class="classification-graph">
+                                <p>Comments Classification</p>
+                                <img src="{{ url_for('static', path='/images/classification_graph_'+video['id']+'.png') }}" alt="">
+                            </div>
                         </div>
-                        <div class="classification-graph">
-                            <p>Comments Classification</p>
-                            <img src="{{ url_for('static', path='/images/classification_graph_'+video['id']+'.png') }}" alt="">
+                        <div class="delete-button">
+                            <a href="#"><button type="button">Delete Toxic Comments</button></a>
                         </div>
-                    </div>
-                    <div class="delete-button">
-                        <a href="#"><button type="button">Delete Comments</button></a>
-                    </div>
+                    {% else %}
+                        <p style="color: grey;">No Comments Found</p>
+                    {% endif %}
                 </div>
-                
             </div>
         </div>
     </body>
