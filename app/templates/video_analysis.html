@@ -10,6 +10,12 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+        <script> 
+            // user changes window, we delete the graphs stored in out server storage
+            window.onbeforeunload = function deleteGraphs() {
+                navigator.sendBeacon("{{ url_for('delete_graphs', video_id = video_id) }}");
+            }
+        </script>
     </head>
     <body>
         <!-- Navigation Bar -->

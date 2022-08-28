@@ -29,7 +29,17 @@ class VideoAnalysis:
         
         inference_loader = data_loader(self.comments_df)
         self.predictions = await predict(inference_loader)
-        return self.predictions
+        
+    
+    async def getToxicIds(self) -> list:
+        """Identifies comment ids which have toxicity in them and returns their list.
+
+        Returns:
+            list: Comment Ids of toxic comments.
+        """
+        
+        toxic_ids = self.predictions[self.predictions.isin([1]).any(axis=1)]["id"].to_list()
+        return toxic_ids
     
     
     async def createWordCloud(self, video_id: str) -> None:

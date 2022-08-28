@@ -123,46 +123,59 @@ async def fetch_video_data(credentials: dict) -> dict:
     return data
 
 
-async def fetch_video_comments(credentials: dict, video_id: str, pageToken: str = "") -> dict:
-    """Fetches comments for given youtube video id.
+async def fetch_video_comments(credentials: dict, video_id: str):
+    """Generator function fetches comments for given youtube video id.
 
     Args:
         credentials (dict): Authorization credentials for accessing channel data.
         video_id (str): Video id corresponding to which fetch comments.
-        pageToken (str, optional): Indicates point from which to fetch comments. Defaults to "".
 
     Raises:
         QuotaExceededError: If request quota is utilized.
         EntityNotFoundError: If comments for given video id doesn't exist.
 
     Returns:
-        dict: Contains updated credentials dict and comment threads dict.
+        AsyncGenerator: A async generator object which can be iterated over to get dict containing updated credentials and comments dict
     """
     
     credentials, youtube = get_creds_and_yt_obj(credentials)
+    pageToken = ""
     
-    try:
-        comment_threads = youtube.commentThreads().list(
-            part = "snippet",
-            maxResults = 100,
-            pageToken = pageToken,
-            videoId = video_id
-        ).execute()
+    # api allows fetching only 100 comments at a time hence repeat to fetch all comments
+    while True:
+        try:
+            comment_threads = youtube.commentThreads().list(
+                part = "snippet",
+                maxResults = 100,
+                pageToken = pageToken,
+                videoId = video_id
+            ).execute()
+            
+        except:
+            raise QuotaExceededError("Request quota exceeded for the day")
         
-    except:
-        raise QuotaExceededError("Request quota exceeded for the day")
-    
-    # if there are no comments posted
-    if "items" not in comment_threads or len(comment_threads["items"]) == 0:
-        raise EntityNotFoundError("comment_thread", "Selected video doesn't have any comments")
-    
-    # return updated credentials and comments
-    data = {
-        "credentials": credentials_to_dict(credentials),
-        "comment_threads": comment_threads
-    }
-    
-    return data
+        # if there are no comments posted
+        if "items" not in comment_threads or len(comment_threads["items"]) == 0:
+            raise EntityNotFoundError("comment_thread", "Selected video doesn't have any comments")
+        
+        comment_dict = {"id": [], "comment_text": []}
+        for comment in comment_threads["items"]:
+            comment_dict["id"].append(comment['snippet']['topLevelComment']['id'])
+            comment_dict["comment_text"].append(comment['snippet']['topLevelComment']['snippet']['textDisplay'])
+        
+        # return updated credentials and comments
+        data = {
+            "credentials": credentials_to_dict(credentials),
+            "comment_dict": comment_dict
+        }
+        
+        # send data to analysis view and go to next iteration if possible
+        yield data
+        
+        if "nextPageToken" in comment_threads:
+            pageToken = comment_threads["nextPageToken"]
+        else:
+            break
 
 
 def get_creds_and_yt_obj(credentials: dict) -> tuple:

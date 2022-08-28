@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse, HTMLResponse
 
@@ -16,7 +18,7 @@ async def video_analysis(request: Request, video_id: str):
 
     Args:
         request (Request): A Request object containing request data sent from client side.
-        video_id (str): Video id for corresponding to which analysis to be done.
+        video_id (str): Video id corresponding to which analysis to be done.
 
     Returns:
         RedirectResponse: Redirects to home page where user authorizes first if not authorized.
@@ -32,7 +34,12 @@ async def video_analysis(request: Request, video_id: str):
     analysis_obj = VideoAnalysis()
     
     try:
-        credentials = await make_comments_dataframe(request.session["credentials"], video_id, analysis_obj)
+        comment_itr = fetch_video_comments(request.session["credentials"], video_id)
+        
+        # get every batch of comments by iterating over async generator object and append to dataframe
+        async for data in comment_itr:
+            request.session["credentials"] = data["credentials"]
+            await analysis_obj.append_comments(data["comment_dict"])
         
     except QuotaExceededError: # request quota is exceeded
         return HTMLResponse("There was an issue in fetching data from youtube. Please comeback in a while.")
@@ -42,55 +49,34 @@ async def video_analysis(request: Request, video_id: str):
     
     else:
         has_comments = True
-        request.session["credentials"] = credentials # store updated credentials in session
 
         # make predictions and necessary graphs
-        preds = await analysis_obj.classifyComments()
+        await analysis_obj.classifyComments()
         await analysis_obj.createWordCloud(video_id)
         await analysis_obj.createClassificationGraph(video_id)
+        # await analysis_obj.getToxicIds()
     
     context_dict = {
         "request": request,
         "channel_details": request.session["channel_data"]["channel_details"],
         "video": request.session["channel_data"]["video_data"][video_id],
+        "video_id": video_id,
         "has_comments": has_comments
     }
     
     return templates.TemplateResponse("video_analysis.html", context = context_dict)
 
 
-async def make_comments_dataframe(credentials: dict, video_id: str, analysis_obj: VideoAnalysis) -> dict:
-    """Helper function that fetches comments from youtube and stores them as dataframe in analysis class.
+@analysis_view.post("/{video_id}")
+async def delete_graphs(video_id: str):
+    """Deletes created graphs when user exits the analysis page.
 
     Args:
-        credentials (dict): Authorization credentials for accessing channel data.
-        video_id (str): Video id corresponding to which fetch comments.
-        analysis_obj (VideoAnalysis): Video Analysis object for selected video.
-
-    Returns:
-        dict: Credentials dict containing updated values.
+        video_id (str): Video id corressponding to which we need to delete the graphs.
     """
     
-    comment_response = await fetch_video_comments(credentials, video_id)
-    
-    # api allows fetching only 100 comments at a time hence repeat to fetch all comments
-    while comment_response:
+    if os.path.exists(f"static/images/word_cloud_{video_id}.png"):
+        os.remove(f"static/images/word_cloud_{video_id}.png")
         
-        credentials = comment_response["credentials"]
-        comment_threads = comment_response["comment_threads"]
-        
-        comment_dict = {"id": [], "comment_text": []}
-        for comment in comment_threads["items"]:
-            comment_dict["id"].append(comment['snippet']['topLevelComment']['id'])
-            comment_dict["comment_text"].append(comment['snippet']['topLevelComment']['snippet']['textDisplay'])
-        
-        # append the fetched comments to dataframe
-        await analysis_obj.append_comments(comment_dict)
-            
-        if "nextPageToken" in comment_threads:
-            pageToken = comment_threads["nextPageToken"]
-            comment_response = await fetch_video_comments(credentials, video_id, pageToken)
-        else:
-            break
-        
-    return credentials
+    if os.path.exists(f"static/images/classification_graph_{video_id}.png"):
+        os.remove(f"static/images/classification_graph_{video_id}.png")
