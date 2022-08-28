@@ -36,7 +36,7 @@ def landing(request: Request):
         request (Request): A Request object containing request data sent from client side.
 
     Returns:
-        TemplateResponse: Home page with context-dict containing necessary data.
+        TemplateResponse: Landing page with context-dict containing necessary data.
     """
     
     return templates.TemplateResponse("landing.html", {"request": request})
