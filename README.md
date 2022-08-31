@@ -27,5 +27,8 @@ YouTube comments and deletes them.
   <h4>Home Page:</h4>
   <img src="https://github.com/Jaydeep2401/DeTox/blob/main/app-ui/home_page.png"><br>
   <h4>Video Analysis Page:</h4>
-  <img src="https://github.com/Jaydeep2401/DeTox/blob/main/app-ui/video_analysis_page.png">
+  <h5>Before removing toxic comments</h5>
+  <img src="https://github.com/Jaydeep2401/DeTox/blob/main/app-ui/video_analysis_page_before.png">
+  <h5>After removing toxic comments</h5>
+  <img src="https://github.com/Jaydeep2401/DeTox/blob/main/app-ui/video_analysis_page_after.png">
 </div>
