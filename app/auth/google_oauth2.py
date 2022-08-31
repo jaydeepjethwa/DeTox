@@ -1,89 +1,96 @@
+import os
+from dotenv import load_dotenv
+
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse, HTMLResponse
 
-import requests
+import httpx
 
-import google.oauth2.credentials
-import google_auth_oauthlib.flow
-
-from . import credentials_to_dict
+from exceptions import *
 
 
-# setting up OAuth 2.0 variables
-# file conaining OAuth 2.0 client application details
-CLIENT_SECRETS_FILE = "client_secret.json"
-
-# specify OAuth 2.0 access scopes for read/modify account data
-SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-
+# getting OAuth 2.0 secret variables
+load_dotenv()
+CLIENT_ID = os.getenv("client_id")
+CLIENT_SECRET = os.getenv("client_secret")
+SCOPE = os.getenv("scope")
+REDIRECT_URI = os.getenv("redirect_uris")
+STATE = os.getenv("state")
 
 # router for authorization urls
 auth_router = APIRouter()
 
-
-@auth_router.get("/")
-async def authorize(request: Request):
-    """Initializes authorization process.
-
-    Args:
-        request (Request): A Request object containing request data sent from client side.
-
-    Returns:
-        RedirectResponse: Redirects to google authentication url.
-    """
-    
-    # flow object to manage OAuth 2.0 Authorization Grant Flow steps
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-           CLIENT_SECRETS_FILE, 
-           scopes = SCOPES
-           )
-    
-    # setting redirect uri 
-    flow.redirect_uri = request.url_for("oauth2callback")
-    
-    authorization_url, state = flow.authorization_url(
-                               access_type = "offline", # enables refreshing access token without re-prompting user
-                               include_granted_scopes = "true"
-                               )
-    
-    # storing the state so that callback can verify the auth server response
-    request.session["state"] = state
-    
-    return RedirectResponse(authorization_url)
+# httpx client for async support
+client = httpx.AsyncClient()
 
 
 @auth_router.get("/oauth2callback")
-async def oauth2callback(request: Request):
-    """Redirect Uniform Resource Identifier (URI), called after authorization process. Verifes the authorization state and stores the credentials in session storage.
+async def oauth2callback(request: Request, state: str = None, code: str = None):
+    """Authorization Uniform Resource Identifier (URI). Seeks authorization from user via google oauth2.0 and retrieves the access token for future yt api calls.
 
     Args:
         request (Request): A Request object containing request data sent from client side.
 
     Returns:
-        RedirectResponse: Redirects to home page.
+        RedirectResponse: Redirects to google authorization page and post verification to home page.
     """
     
-    # specifying state in callback so that it can verify authorization response
-    state = request.session["state"]
+    if code == None:
+        auth_uri = f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope={SCOPE}&access_type=offline&state={STATE}"
+        
+        return RedirectResponse(auth_uri)
+        
+    else:
+        # ensure that authorization request was called from our application
+        if STATE != state:
+            return HTMLResponse(f"Invalid state parameter. Please visit the <a href={request.url_for('landing')}>web-app</a> to complete the authorization.You need to before testing the code to revoke credentials.")
+        
+        # retrieve access token
+        auth_code = code
+        data = {
+            "code": auth_code,
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "redirect_uri": REDIRECT_URI,
+            "grant_type": "authorization_code"
+        }
+        
+        response = await client.post("https://oauth2.googleapis.com/token", data = data)
+        
+        request.session["credentials"] = response.json()
+        
+        return RedirectResponse(request.url_for("home"))
     
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-           CLIENT_SECRETS_FILE, 
-           scopes = SCOPES,
-           state = state
-           )
+
+@auth_router.get("/refresh-access-token")
+async def refresh_access_token(request: Request):
+    """Gets new access token using refresh token.
+
+    Args:
+        request (Request): A Request object containing request data sent from client side.
+
+    Returns:
+        RedirectResponse: Redirects to page from which request was originated.
+    """
     
-    flow.redirect_uri = request.url_for("oauth2callback")
+    data = {
+        "client_id": CLIENT_ID, 
+        "client_secret": CLIENT_SECRET,
+        "refresh_token": request.session["credentials"]["refresh_token"],
+        "grant_type": "refresh_token"
+    }
     
-    # fetching OAuth 2.0 tokens
-    authorization_response = str(request.url)
-    flow.fetch_token(authorization_response=authorization_response)
+    response = await client.post("https://oauth2.googleapis.com/token", data = data)
+    # yt refresh tokens don't expire hence no error in most cases
     
-    # storing credentials in the session
-    credentials = flow.credentials
-    request.session["credentials"] = credentials_to_dict(credentials)
+    credentials = response.json()
+    request.session["credentials"]["access_token"] = credentials["access_token"]
+    request.session["credentials"]["expires_in"] = credentials["expires_in"]
     
-    return RedirectResponse(request.url_for("home"))
-  
+    redirect_url = request.session["redirect_url"]
+    
+    return RedirectResponse(redirect_url)
+    
 
 @auth_router.get("/revoke")
 async def revoke(request: Request):
@@ -98,21 +105,26 @@ async def revoke(request: Request):
     
     # if not logged in login first
     if "credentials" not in request.session:
-        return HTMLResponse(f"You need to <a href={request.url_for('authorize')}>authorize</a> before testing the code to revoke credentials.")
+        return HTMLResponse(f"You need to <a href={request.url_for('oauth2callback')}>authorize</a> before testing the code to revoke credentials.")
     
-    # get credentials from session and create google Credentials class
-    credentials = google.oauth2.credentials.Credentials(**request.session["credentials"])
+    # get credentials from session
+    credentials = request.session["credentials"]
     
     # revoke accesss
-    response = requests.post("https://oauth2.googleapis.com/revoke",
-        params = {"token": credentials.token},
+    response = await client.post("https://oauth2.googleapis.com/revoke",
+        params = {"token": credentials["access_token"]},
         headers = {"content-type": "application/x-www-form-urlencoded"}
     )
     
-    if response.status_code == 200: # if success clear the session i.e. logout
-        return RedirectResponse(request.url_for("logout"))
-    else:
-        return RedirectResponse(request.url_for("home"))
+    # fails when quota exceeds or access token expires
+    if response.status_code == 403:
+        return HTMLResponse("Cannot connect to youtube right now. Please comeback in a while.")
+    
+    elif response.status_code == 401:
+        request.session["redirect_url"] = str(request.url)
+        return RedirectResponse(request.url_for("refresh_access_token"))
+    
+    return RedirectResponse(request.url_for("logout"))
     
 
 @auth_router.get("/logout")

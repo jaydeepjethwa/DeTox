@@ -1,8 +1,9 @@
 from .model_class import DetoxClass
+from .data_loader import data_loader
 from . import torch, np, pd, fine_tuned_path
 
 
-def load_model():
+def load_model() -> None:
     """Loads fine-tuned model for prediction."""
     
     global device, model
@@ -19,7 +20,7 @@ def load_model():
         model.load_state_dict(torch.load(fine_tuned_path, map_location=device))
 
 
-async def predict(inference_loader):
+def predict(data: pd.DataFrame) -> pd.DataFrame:
     """Predics classes of the comments.
 
     Args:
@@ -29,6 +30,9 @@ async def predict(inference_loader):
         pandas DataFrame: DataFrame containing predicted class for comments.
     """
 
+    # get data loader
+    inference_loader = data_loader(data)
+    
     # set model to evaluation (inference) mode
     model.eval()
     comment_id = []

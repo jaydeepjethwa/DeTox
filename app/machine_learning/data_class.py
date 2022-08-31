@@ -4,7 +4,7 @@ from . import torch, Dataset
 class DetoxDataset(Dataset):
     """PyTorch dataset class."""
 
-    def __init__(self, dataframe, tokenizer, max_len):
+    def __init__(self, dataframe, tokenizer, max_len) -> None:
         """Constructor for class.
 
         Args:
@@ -18,15 +18,15 @@ class DetoxDataset(Dataset):
         self.comment_text = self.data.comment_text
         self.max_len = max_len
 
-    def __len__(self):
-        """
+    def __len__(self) -> int:
+        """Identifies no. of instances (rows) in dataset
         Returns:
             int: Length (instances) of current dataset.
         """
         
         return len(self.comment_text)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> dict:
         """Returns instance from dataset that is ready to be passed to ml model.
         Args:
             index (int): Index of instance to be returned.
@@ -47,6 +47,7 @@ class DetoxDataset(Dataset):
             return_token_type_ids=True,
             truncation=True
         )
+        
         ids = inputs['input_ids']
         mask = inputs['attention_mask']
         token_type_ids = inputs["token_type_ids"]

@@ -13,11 +13,24 @@
         <script> 
             // user changes window, we delete the graphs stored in out server storage
             window.onbeforeunload = function deleteGraphs() {
-                navigator.sendBeacon("{{ url_for('delete_graphs', video_id = video_id) }}");
+                fetch("{{ url_for('delete_graphs', video_id = video_id) }}", {method: "DELETE"})
+            }
+            // confirmation before redirecting to reject comments
+            function rejectComments() {
+                if("{{ video['toxic_ids']|length }}" == 0) {
+                    alert("No toxic comments found to reject.")
+                }
+                else if(confirm("Are you sure?") == true) {
+                    document.getElementById("loader").style.display = "block";
+                    document.getElementById("body-content").style.display = "none";
+                    return true;
+                }
+                return false;
             }
         </script>
     </head>
     <body>
+        <div id="loader" class="center"></div>
         <!-- Navigation Bar -->
         <div class="navbar">
             <a href="{{ url_for('landing') }}"><img src="{{ url_for('static', path='/images/detox_logo.svg') }}" alt="DeTox"></a>
@@ -31,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="body-content">
+        <div id="body-content" class="body-content">
             <div class="side-bar">
                 <img src="{{ video['thumbnail_url'] }}" alt="" style="border-radius: 2%; width: 80%; height: auto;">
                 
@@ -58,7 +71,7 @@
                             </div>
                         </div>
                         <div class="delete-button">
-                            <a href="#"><button type="button">Delete Toxic Comments</button></a>
+                            <a href="{{ url_for('reject_comments', video_id = video_id) }}"><button type="button" onclick="return rejectComments()">Reject Toxic Comments</button></a>
                         </div>
                     {% else %}
                         <p style="color: grey;">No Comments Found</p>

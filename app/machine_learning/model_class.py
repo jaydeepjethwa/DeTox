@@ -3,7 +3,7 @@ from . import BertModel, Module, Dropout, Linear, pretrained_path
 class DetoxClass(Module):
     """PyTorch Model Class."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         """Constructor. Defines layers of the model."""
         
         super(DetoxClass, self).__init__()

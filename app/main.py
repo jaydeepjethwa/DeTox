@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +13,7 @@ from machine_learning import load_tokeninzer, load_model
 
 
 # allowing http urls for testing TO BE REMOVED WHILE DEPLOYING
+load_dotenv() # for loading variables from .env file
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # initializing fastapi app, adding static files directory and session middelware for session management

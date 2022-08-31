@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse, HTMLResponse
 
-from library.youtube import fetch_channel_data, fetch_video_data
+from library.youtube import fetchChannelData, fetchVideoData
 
 from exceptions import *
 
 from config import templates
+
 
 home_view = APIRouter()
 
@@ -24,24 +25,27 @@ async def home(request: Request):
     
     # if not authorized, auhthorize first
     if "credentials" not in request.session:
-        return RedirectResponse(request.url_for("authorize"))
+        return RedirectResponse(request.url_for("oauth2callback"))
     
     # check if required data is already loaded in session if yes, get it from there else fetch from YT
     if "channel_data" not in request.session:
+        credentials = request.session["credentials"]
         request.session["channel_data"] = {}
         try:
             # fetch channel details
-            channel_response = await fetch_channel_data(request.session["credentials"])
-            request.session["channel_data"]["channel_details"] = channel_response["channel_details"]
-            request.session["credentials"] = channel_response["credentials"] # storing updated credentials
+            channel_details = await fetchChannelData(credentials)
+            request.session["channel_data"]["channel_details"] = channel_details
             
             # fetch video data
-            video_response = await fetch_video_data(request.session["credentials"])
-            request.session["channel_data"]["video_data"] = video_response["video_data"]
-            request.session["credentials"] = video_response["credentials"]
+            video_data = await fetchVideoData(credentials)
+            request.session["channel_data"]["video_data"] = video_data
             
         except QuotaExceededError: # request quota is exceeded
-            return HTMLResponse("There was an issue in fetching data from youtube. Please comeback in a while.")
+            return HTMLResponse("Cannot connect to youtube right now. Please comeback in a while.")
+        
+        except AccessTokenExpiredError: # get fresh access token using refresh token
+            request.session["redirect_url"] = str(request.url)
+            return RedirectResponse(request.url_for("refresh_access_token"))
         
         except EntityNotFoundError as entity_error: # no channel or videos not found
             if entity_error.entity == "channel":

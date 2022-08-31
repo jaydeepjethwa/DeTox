@@ -1,14 +1,15 @@
-from google.oauth2.credentials import Credentials
-import googleapiclient.discovery
+import os
+
+import httpx
 
 from exceptions import *
 
-from auth import credentials_to_dict
+# clint secret key for sending requests to yt api
+KEY = os.getenv("client_secret")
 
-API_SERVICE_NAME, API_VERSION = "youtube", "v3"
+client = httpx.AsyncClient()
 
-
-async def fetch_channel_data(credentials: dict) -> dict:
+async def fetchChannelData(credentials: dict) -> dict:
     """Fetches youtube channel data for authorized google account.
 
     Args:
@@ -16,45 +17,52 @@ async def fetch_channel_data(credentials: dict) -> dict:
 
     Raises:
         QuotaExceededError: If request quota is utilized.
+        AccessTokenExpiredError: If access token in authorization header has expired.
         EntityNotFoundError: If youtube channel for authorized account doesn't exist.
 
     Returns:
-        dict: Contains updated credentials dict and channel details dict.
+        dict: Channel details of logged in user.
     """
     
-    credentials, youtube = get_creds_and_yt_obj(credentials)
+    request_uri = "https://www.googleapis.com/youtube/v3/channels"
     
-    # get channel data from yt account
-    try:
-        channel_resource = youtube.channels().list(
-            mine = True, 
-            part = 'snippet,contentDetails,statistics'
-        ).execute()
-        
-    except: # fails when quota exceeds
+    headers = {
+        "Authorization": f"Bearer {credentials['access_token']}",
+        "Accept": "application/json"
+    }
+    
+    params = {
+        "mine": "true",
+        "part": "snippet,contentDetails,statistics",
+        "key": KEY
+    }
+    
+    response = await client.get(request_uri, params = params, headers = headers)
+    
+    # fails when quota exceeds or access token expires
+    if response.status_code == 403:
         raise QuotaExceededError("Request quota exceeded for the day.")
+    
+    elif response.status_code == 401:
+        raise AccessTokenExpiredError("Current access token expired, get a fresh one.")
+    
+    channel_resource = response.json()
     
     # check if channel exists
     if "items" not in channel_resource:
         raise EntityNotFoundError("channel", "Authorized goole account doesn't have a youtube channel.")
     
-    # extract channel details
+    # extract required channel details
     channel_details = {
         "name": channel_resource["items"][0]["snippet"]["title"],
         "logo_url": channel_resource["items"][0]["snippet"]["thumbnails"]["medium"]["url"],
         "stats": channel_resource["items"][0]["statistics"]
     }
     
-    # return updated credentials and channel details
-    data = {
-        "credentials": credentials_to_dict(credentials),
-        "channel_details": channel_details
-    }
-    
-    return data
+    return channel_details
 
 
-async def fetch_video_data(credentials: dict) -> dict:
+async def fetchVideoData(credentials: dict) -> dict:
     """Fetches video data for logged in youtube channel.
 
     Args:
@@ -62,27 +70,40 @@ async def fetch_video_data(credentials: dict) -> dict:
 
     Raises:
         QuotaExceededError: If request quota is utilized.
+        AccessTokenExpiredError: If access token in authorization header has expired.
         EntityNotFoundError: If videos for logged in channel doesn't exist.
 
     Returns:
-        dict: Contains updated credentials dict and video data dict.
+        dict: Video data for latest 3 videos of the user.
     """
     
-    credentials, youtube = get_creds_and_yt_obj(credentials)
+    request_uri = "https://www.googleapis.com/youtube/v3/search"
     
-    # get latest 3 videos from channel
-    try:
-        video_resource = youtube.search().list(
-            part = "snippet",
-            forMine = True,
-            maxResults = 3,
-            order = "date",
-            type = "video"
-        ).execute()
-        
-    except: # fails when quota exceeds
+    headers = {
+        "Authorization": f"Bearer {credentials['access_token']}",
+        "Accept": "application/json"
+    }
+
+    params = {
+        "part": "snippet",
+        "forMine": "true",
+        "maxResults": 3,    # get latest 3 videos from channel
+        "order": "date",
+        "type": "video",
+        "key": KEY
+    }
+    
+    response = await client.get(request_uri, params = params, headers = headers)
+    
+    # fails when quota exceeds or access token expires
+    if response.status_code == 403:
         raise QuotaExceededError("Request quota exceeded for the day.")
-        
+    
+    elif response.status_code == 401:
+        raise AccessTokenExpiredError("Current access token expired, get a fresh one.")
+    
+    video_resource = response.json()
+    
     # if no videos uploaded
     if "items" not in video_resource or len(video_resource["items"]) == 0:
         raise EntityNotFoundError("video", "Authorized youtube account haven't uploaded videos.")
@@ -91,16 +112,26 @@ async def fetch_video_data(credentials: dict) -> dict:
     video_ids = ",".join(resource["id"]["videoId"] for resource in video_resource["items"])
     
     # get video data from obtained video ids
-    try:
-        video_details = youtube.videos().list(
-            part="snippet,contentDetails,statistics",
-            id=video_ids
-        ).execute()
-        
-    except: # fails when quota exceeds
+    request_uri = "https://www.googleapis.com/youtube/v3/videos"
+
+    params = {
+        "part": "snippet,contentDetails,statistics",
+        "id": video_ids,
+        "key": KEY
+    }
+    
+    response = await client.get(request_uri, params = params, headers = headers)
+    
+    # fails when quota exceeds or access token expires
+    if response.status_code == 403:
         raise QuotaExceededError("Request quota exceeded for the day.")
     
-    # save video data in session for faster access, minimizing api quota
+    elif response.status_code == 401:
+        raise AccessTokenExpiredError("Current access token expired, get a fresh one.")
+    
+    video_details = response.json()
+    
+    # extract required video data
     video_data = {}
     
     for data in video_details["items"]:
@@ -114,16 +145,10 @@ async def fetch_video_data(credentials: dict) -> dict:
             "thumbnail_url": data["snippet"]["thumbnails"]["medium"]["url"]
         }
     
-    # return updated credentials and video data
-    data = {
-        "credentials": credentials_to_dict(credentials),
-        "video_data": video_data
-    }
-    
-    return data
+    return video_data
 
 
-async def fetch_video_comments(credentials: dict, video_id: str):
+async def fetchVideoComments(credentials: dict, video_id: str):
     """Generator function fetches comments for given youtube video id.
 
     Args:
@@ -132,27 +157,42 @@ async def fetch_video_comments(credentials: dict, video_id: str):
 
     Raises:
         QuotaExceededError: If request quota is utilized.
+        AccessTokenExpiredError: If access token in authorization header has expired.
         EntityNotFoundError: If comments for given video id doesn't exist.
 
     Returns:
-        AsyncGenerator: A async generator object which can be iterated over to get dict containing updated credentials and comments dict
+        AsyncGenerator: An async generator object which can be iterated over to get dict containing comments data for specified video.
     """
     
-    credentials, youtube = get_creds_and_yt_obj(credentials)
     pageToken = ""
     
-    # api allows fetching only 100 comments at a time hence repeat to fetch all comments
+    request_uri = "https://www.googleapis.com/youtube/v3/commentThreads"
+    
+    headers = {
+        "Authorization": f"Bearer {credentials['access_token']}",
+        "Accept": "application/json"
+    }
+    
+    # yt api allows fetching only 100 comments at a time hence repeat to fetch all comments
     while True:
-        try:
-            comment_threads = youtube.commentThreads().list(
-                part = "snippet",
-                maxResults = 100,
-                pageToken = pageToken,
-                videoId = video_id
-            ).execute()
-            
-        except:
-            raise QuotaExceededError("Request quota exceeded for the day")
+        params = {
+            "part": "snippet",
+            "maxResults": 100,
+            "pageToken": pageToken,
+            "video_id": video_id,
+            "key": KEY
+        }
+        
+        response = await client.get(request_uri, params = params, headers = headers)
+        
+        # fails when quota exceeds or access token expires
+        if response.status_code == 403:
+            raise QuotaExceededError("Request quota exceeded for the day.")
+        
+        elif response.status_code == 401:
+            raise AccessTokenExpiredError("Current access token expired, get a fresh one.")
+        
+        comment_threads = response.json()
         
         # if there are no comments posted
         if "items" not in comment_threads or len(comment_threads["items"]) == 0:
@@ -163,33 +203,45 @@ async def fetch_video_comments(credentials: dict, video_id: str):
             comment_dict["id"].append(comment['snippet']['topLevelComment']['id'])
             comment_dict["comment_text"].append(comment['snippet']['topLevelComment']['snippet']['textDisplay'])
         
-        # return updated credentials and comments
-        data = {
-            "credentials": credentials_to_dict(credentials),
-            "comment_dict": comment_dict
-        }
-        
         # send data to analysis view and go to next iteration if possible
-        yield data
+        yield comment_dict
         
         if "nextPageToken" in comment_threads:
             pageToken = comment_threads["nextPageToken"]
         else:
             break
-
-
-def get_creds_and_yt_obj(credentials: dict) -> tuple:
-    """Creates credential and youtube request objects.
+        
+        
+async def rejectComments(credentials: dict, toxic_ids: list) -> None:
+    """Set moderation status of toxic comment ids provided as 'rejected'.
 
     Args:
         credentials (dict): Authorization credentials for accessing channel data.
+        toxic_ids (list): List of ids of comments which are identified as toxic.
 
-    Returns:
-        tuple: updated credentials and youtube objects used to communicate with youtube data api.
+    Raises:
+        QuotaExceededError: If request quota is utilized.
+        AccessTokenExpiredError: If access token in authorization header has expired.
     """
     
-    credentials = Credentials(**credentials)
+    request_uri = "https://www.googleapis.com/youtube/v3/comments/setModerationStatus"
+
+    headers = {
+        "Authorization": f"Bearer {credentials['access_token']}",
+        "Accept": "application/json"
+    }
     
-    youtube = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
+    params = {
+        "id": ",".join(id for id in toxic_ids),
+        "moderationStatus": "rejected",
+        "key": KEY
+    }
     
-    return credentials, youtube
+    response = await client.post(request_uri, params = params, headers = headers)
+    
+    # fails when quota exceeds or access token expires
+    if response.status_code == 403:
+        raise QuotaExceededError("Request quota exceeded for the day.")
+    
+    elif response.status_code == 401:
+        raise AccessTokenExpiredError("Current access token expired, get a fresh one.")

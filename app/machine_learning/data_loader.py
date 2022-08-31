@@ -1,19 +1,19 @@
 from . import BertTokenizer, DataLoader, pretrained_path
 from .data_class import DetoxDataset
 
-# parameters for data
+# parameters for data loader
 MAX_LEN = 200
 BATCH_SIZE = 8
 
 
-def load_tokeninzer():
+def load_tokeninzer() -> None:
     """Loads BERT Tokenizer."""
     
     global tokenizer
     tokenizer = BertTokenizer.from_pretrained(pretrained_path)
 
 
-def data_loader(data):
+def data_loader(data) -> DataLoader:
     """Creates and returns a iterative data loader object for making predictions in batch.
 
     Args:

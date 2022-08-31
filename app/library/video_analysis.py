@@ -1,17 +1,19 @@
-from machine_learning import data_loader, predict, pd
+from machine_learning import predict, pd
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 
 class VideoAnalysis:
     """Performs video analysis i.e. comments classification and generating respective plots."""
     
-    def __init__(self):
+    def __init__(self) -> None:
+        """Constructor for the class. Initializes comments and predictions dataframes"""
+        
         self.comments_df = pd.DataFrame(columns = ["id", "comment_text"])
         self.predictions = pd.DataFrame()
         
     
-    async def append_comments(self, comment_dict: dict) -> None:
-        """Appends comments to the comments DataFrame.
+    def appendComments(self, comment_dict: dict) -> None:
+        """Appends comments dict received from api call to the comments DataFrame.
 
         Args:
             comment_dict (dict): Dictionary containing comment id and comment text.
@@ -20,18 +22,13 @@ class VideoAnalysis:
         self.comments_df = pd.concat([self.comments_df, pd.DataFrame(comment_dict)], ignore_index = True)
     
     
-    async def classifyComments(self) -> pd.DataFrame:
-        """Classifies the comments for comments DataFrame.
-
-        Returns:
-            pandas DataFrame: A dataFrame with comment ids and their corressponding predicted classes.
-        """
-        
-        inference_loader = data_loader(self.comments_df)
-        self.predictions = await predict(inference_loader)
+    def classifyComments(self) -> None:
+        """Classifies the comments for comments DataFrame."""
+         
+        self.predictions = predict(self.comments_df)
         
     
-    async def getToxicIds(self) -> list:
+    def getToxicIds(self) -> list:
         """Identifies comment ids which have toxicity in them and returns their list.
 
         Returns:
@@ -42,7 +39,7 @@ class VideoAnalysis:
         return toxic_ids
     
     
-    async def createWordCloud(self, video_id: str) -> None:
+    def createWordCloud(self, video_id: str) -> None:
         """Creates word cloud for comments DataFrame.
 
         Args:
@@ -62,7 +59,7 @@ class VideoAnalysis:
         comments_cloud.to_file(f"static/images/word_cloud_{video_id}.png")
         
 
-    async def createClassificationGraph(self, video_id: str) -> None:
+    def createClassificationGraph(self, video_id: str) -> None:
         """Creates bar graph for count of each class predicted."
 
         Args:
