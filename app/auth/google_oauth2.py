@@ -40,7 +40,7 @@ async def oauth2callback(request: Request, state: str = None, code: str = None):
     else:
         # ensure that authorization request was called from our application
         if STATE != state:
-            return HTMLResponse(f"Invalid state parameter. Please visit the <a href={request.url_for('landing')}>web-app</a> to complete the authorization.You need to before testing the code to revoke credentials.")
+            return HTMLResponse(f"Invalid state parameter. Please visit the <a href={request.url_for('landing')}>web-app</a> to complete the authorization.")
         
         # retrieve access token
         auth_code = code

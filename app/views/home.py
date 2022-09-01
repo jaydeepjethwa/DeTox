@@ -64,3 +64,19 @@ async def home(request: Request):
     }
     
     return templates.TemplateResponse("home.html", context = context_dict)
+
+
+@home_view.get("/refresh-home")
+async def refresh_home(request: Request):
+    """Clears the channel data stored in session storage.
+
+    Args:
+        request (Request): A Request object containing request data sent from client side.
+
+    Returns:
+        RedirectResponse: Redirects to home page where updated channel data is fetched.
+    """
+    
+    del request.session["channel_data"]
+    
+    return RedirectResponse(request.url_for("home"))

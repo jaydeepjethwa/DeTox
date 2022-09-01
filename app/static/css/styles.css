@@ -180,6 +180,16 @@ html, body {
     margin-inline-end: 1em;
 }
 
+.side-bar .button-holder button {
+    vertical-align: middle;
+    background-color: #00ffd0;
+    color: black;
+    line-height: 2.5;
+    padding: 0 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
 /* Main Section */
 .main-content {
     float: left;

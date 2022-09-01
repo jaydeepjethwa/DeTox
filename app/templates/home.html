@@ -40,6 +40,10 @@
                 <p>Video Count: {{ channel_details['stats']["videoCount"] }}</p>
                 <p>Total Views: {{ channel_details['stats']["viewCount"] }}</p>
                 <p>Subscribers: {{ channel_details['stats']["subscriberCount"] }}</p>
+                <br>
+                <div class="button-holder">
+                    <a href="{{ url_for('refresh_home') }}"><button type="button" onclick="displayLoader()">Refresh Content</button></a>
+                </div>
             </div>
             <div class="main-content">
                 <p style="font-size: 20px;">My Videos</p> 

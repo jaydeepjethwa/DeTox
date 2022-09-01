@@ -42,7 +42,7 @@ async def video_analysis(request: Request, video_id: str):
             analysis_obj.appendComments(comment_dict)
         
     except QuotaExceededError: # request quota is exceeded
-        return HTMLResponse("There was an issue in fetching data from youtube. Please comeback in a while.")
+        return HTMLResponse("Cannot connect to youtube right now. Please comeback in a while.")
     
     except AccessTokenExpiredError: # get fresh access token using refresh token
         request.session["redirect_url"] = str(request.url)
@@ -113,7 +113,7 @@ async def reject_comments(request: Request, video_id: str):
         await rejectComments(request.session["credentials"], toxic_ids)
     
     except QuotaExceededError: # request quota is exceeded
-        return HTMLResponse("There was an issue in fetching data from youtube. Please comeback in a while.")
+        return HTMLResponse("Cannot connect to youtube right now. Please comeback in a while..")
     
     except AccessTokenExpiredError: # get fresh access token using refresh token
         request.session["redirect_url"] = str(request.url)
