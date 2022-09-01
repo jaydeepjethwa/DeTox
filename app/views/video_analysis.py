@@ -1,6 +1,6 @@
 import os
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse, HTMLResponse
 
 from library.youtube import fetchVideoComments, rejectComments
@@ -87,6 +87,8 @@ async def delete_graphs(video_id: str):
         
     if os.path.exists(f"static/images/classification_graph_{video_id}.png"):
         os.remove(f"static/images/classification_graph_{video_id}.png")
+        
+    return Response(status_code = 200)
         
 
 @analysis_view.get("/reject-comments/{video_id}")

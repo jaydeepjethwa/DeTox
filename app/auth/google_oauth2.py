@@ -20,9 +20,6 @@ STATE = os.getenv("state")
 # router for authorization urls
 auth_router = APIRouter()
 
-# httpx client for async support
-client = httpx.AsyncClient()
-
 
 @auth_router.get("/oauth2callback")
 async def oauth2callback(request: Request, state: str = None, code: str = None):
@@ -55,7 +52,8 @@ async def oauth2callback(request: Request, state: str = None, code: str = None):
             "grant_type": "authorization_code"
         }
         
-        response = await client.post("https://oauth2.googleapis.com/token", data = data)
+        async with httpx.AsyncClient() as client:
+            response = await client.post("https://oauth2.googleapis.com/token", data = data)
         
         request.session["credentials"] = response.json()
         
@@ -80,8 +78,11 @@ async def refresh_access_token(request: Request):
         "grant_type": "refresh_token"
     }
     
-    response = await client.post("https://oauth2.googleapis.com/token", data = data)
-    # yt refresh tokens don't expire hence no error in most cases
+    async with httpx.AsyncClient() as client:
+        response = await client.post("https://oauth2.googleapis.com/token", data = data)
+    
+    if response.status_code == 400: # apps access to yt account has been revoked
+        return HTMLResponse(f"Web-app's access to your youtube account has been revoked. Please <a href={request.url_for('oauth2callback')}>authorize</a> to continue using the service.")
     
     credentials = response.json()
     request.session["credentials"]["access_token"] = credentials["access_token"]
@@ -105,16 +106,17 @@ async def revoke(request: Request):
     
     # if not logged in login first
     if "credentials" not in request.session:
-        return HTMLResponse(f"You need to <a href={request.url_for('oauth2callback')}>authorize</a> before testing the code to revoke credentials.")
+        return HTMLResponse(f"You need to <a href={request.url_for('oauth2callback')}>authorize</a> first before revoking the credentials.")
     
     # get credentials from session
     credentials = request.session["credentials"]
     
     # revoke accesss
-    response = await client.post("https://oauth2.googleapis.com/revoke",
-        params = {"token": credentials["access_token"]},
-        headers = {"content-type": "application/x-www-form-urlencoded"}
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.post("https://oauth2.googleapis.com/revoke",
+            params = {"token": credentials["access_token"]},
+            headers = {"content-type": "application/x-www-form-urlencoded"}
+        )
     
     # fails when quota exceeds or access token expires
     if response.status_code == 403:

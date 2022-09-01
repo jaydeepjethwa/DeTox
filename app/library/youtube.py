@@ -7,7 +7,6 @@ from exceptions import *
 # clint secret key for sending requests to yt api
 KEY = os.getenv("client_secret")
 
-client = httpx.AsyncClient()
 
 async def fetchChannelData(credentials: dict) -> dict:
     """Fetches youtube channel data for authorized google account.
@@ -36,8 +35,8 @@ async def fetchChannelData(credentials: dict) -> dict:
         "part": "snippet,contentDetails,statistics",
         "key": KEY
     }
-    
-    response = await client.get(request_uri, params = params, headers = headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(request_uri, params = params, headers = headers)
     
     # fails when quota exceeds or access token expires
     if response.status_code == 403:
@@ -92,8 +91,8 @@ async def fetchVideoData(credentials: dict) -> dict:
         "type": "video",
         "key": KEY
     }
-    
-    response = await client.get(request_uri, params = params, headers = headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(request_uri, params = params, headers = headers)
     
     # fails when quota exceeds or access token expires
     if response.status_code == 403:
@@ -120,7 +119,8 @@ async def fetchVideoData(credentials: dict) -> dict:
         "key": KEY
     }
     
-    response = await client.get(request_uri, params = params, headers = headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(request_uri, params = params, headers = headers)
     
     # fails when quota exceeds or access token expires
     if response.status_code == 403:
@@ -183,7 +183,8 @@ async def fetchVideoComments(credentials: dict, video_id: str):
             "key": KEY
         }
         
-        response = await client.get(request_uri, params = params, headers = headers)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(request_uri, params = params, headers = headers)
         
         # fails when quota exceeds or access token expires
         if response.status_code == 403:
@@ -237,7 +238,8 @@ async def rejectComments(credentials: dict, toxic_ids: list) -> None:
         "key": KEY
     }
     
-    response = await client.post(request_uri, params = params, headers = headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(request_uri, params = params, headers = headers)
     
     # fails when quota exceeds or access token expires
     if response.status_code == 403:
