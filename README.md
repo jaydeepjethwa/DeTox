@@ -20,7 +20,9 @@ YouTube comments and deletes them.
 - Created various views (web-pages) that helps user to navigate through the web-app.
 - Integrated the trained ML model with the web-app to classify and delete comments of the selected video.
 
-### Web-App Screenshots:
+### Web-App Demo & Screenshots:
+![]("https://github.com/Jaydeep2401/DeTox/blob/main/app-ui/detox_working.gif)
+<br>
 <div>
   <h4>Landing Page:</h4>
   <img src="https://github.com/Jaydeep2401/DeTox/blob/main/app-ui/landing_page.png"><br>
