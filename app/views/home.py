@@ -7,6 +7,7 @@ from exceptions import *
 
 from config import templates
 
+import asyncio
 
 home_view = APIRouter()
 
@@ -32,12 +33,14 @@ async def home(request: Request):
         credentials = request.session["credentials"]
         request.session["channel_data"] = {}
         try:
-            # fetch channel details
-            channel_details = await fetchChannelData(credentials)
+            # fetch channel details &  video data
+            channel_details, video_data = await asyncio.gather(
+                fetchChannelData(credentials),
+                fetchVideoData(credentials)
+            )
+             
+            # store them in session storage
             request.session["channel_data"]["channel_details"] = channel_details
-            
-            # fetch video data
-            video_data = await fetchVideoData(credentials)
             request.session["channel_data"]["video_data"] = video_data
             
         except QuotaExceededError: # request quota is exceeded
