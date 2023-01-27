@@ -1,4 +1,6 @@
-from . import BertModel, Module, Dropout, Linear, pretrained_path
+from transformers import BertModel
+from torch.nn import Module, Dropout, Linear
+from . import pretrained_path
 
 class DetoxClass(Module):
     """PyTorch Model Class."""

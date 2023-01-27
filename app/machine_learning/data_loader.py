@@ -1,5 +1,7 @@
-from . import BertTokenizer, DataLoader, pretrained_path
+from transformers import BertTokenizer
+from torch.utils.data import DataLoader
 from .data_class import DetoxDataset
+from . import pretrained_path
 
 # parameters for data loader
 MAX_LEN = 200

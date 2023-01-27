@@ -1,6 +1,9 @@
+import torch
+import numpy as np
+import pandas as pd
 from .model_class import DetoxClass
 from .data_loader import data_loader
-from . import torch, np, pd, fine_tuned_path
+from . import fine_tuned_path
 
 
 def load_model() -> None:

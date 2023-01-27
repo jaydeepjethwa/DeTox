@@ -1,5 +1,5 @@
-from . import torch, Dataset
-
+import torch
+from torch.utils.data import Dataset
 
 class DetoxDataset(Dataset):
     """PyTorch dataset class."""
