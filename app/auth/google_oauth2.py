@@ -11,11 +11,11 @@ from exceptions import *
 
 # getting OAuth 2.0 secret variables
 load_dotenv()
-CLIENT_ID = os.getenv("client_id")
-CLIENT_SECRET = os.getenv("client_secret")
-SCOPE = os.getenv("scope")
-REDIRECT_URI = os.getenv("redirect_uris")
-STATE = os.getenv("state")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+SCOPE = os.getenv("SCOPE")
+REDIRECT_URI = os.getenv("REDIRECT_URIS")
+STATE = os.getenv("STATE")
 
 # router for authorization urls
 auth_router = APIRouter()

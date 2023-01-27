@@ -5,7 +5,7 @@ import httpx
 from exceptions import *
 
 # clint secret key for sending requests to yt api
-KEY = os.getenv("client_secret")
+KEY = os.getenv("CLIENT_SECRET")
 
 
 async def fetchChannelData(credentials: dict) -> dict:

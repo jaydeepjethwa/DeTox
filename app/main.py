@@ -19,7 +19,7 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 # initializing fastapi app, adding static files directory and session middelware for session management
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.add_middleware(SessionMiddleware, secret_key = os.getenv("session_secret"))
+app.add_middleware(SessionMiddleware, secret_key = os.getenv("SESSION_SECRET"))
 
 
 @app.on_event("startup")
