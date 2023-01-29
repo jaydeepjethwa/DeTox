@@ -1,6 +1,8 @@
-from machine_learning import predict, pd
+import pandas as pd
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
+
+from machine_learning import predict
 
 class VideoAnalysis:
     """Performs video analysis i.e. comments classification and generating respective plots."""
