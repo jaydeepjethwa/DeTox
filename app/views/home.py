@@ -11,7 +11,7 @@ import asyncio
 
 home_view = APIRouter()
 
-@home_view.get("/")
+@home_view.get("")
 async def home(request: Request):
     """Home page of the web-app.
 
@@ -33,14 +33,11 @@ async def home(request: Request):
         credentials = request.session["credentials"]
         request.session["channel_data"] = {}
         try:
-            # fetch channel details &  video data
-            channel_details, video_data = await asyncio.gather(
-                fetchChannelData(credentials),
-                fetchVideoData(credentials)
-            )
-             
-            # store them in session storage
+            # fetch channel details &  video data and store it in session storage
+            channel_details = await fetchChannelData(credentials)
             request.session["channel_data"]["channel_details"] = channel_details
+
+            video_data = await fetchVideoData(credentials)
             request.session["channel_data"]["video_data"] = video_data
             
         except QuotaExceededError: # request quota is exceeded
