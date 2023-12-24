@@ -14,7 +14,7 @@ YouTube comments and deletes them.
 
 - Performed exploratory data analysis on the data such as finding no. of instances per class, finding null values, determining max len for the comment.
 - Divided the data into train and test set by using stratified sampling technique to maintain class ratio in both set.
-- Fine-tuned the BERT model using PyTorch and Hugging Face transformers libraries, evaluated its performance and saved the model.
+- Fine-tuned the BERT model using PyTorch and Hugging Face transformers libraries, evaluated its performance and saved the model. [Fine Tuned Toxicity Detection Model .pth file](https://mega.nz/file/ojMDCQyK#m-mTe4VsldWhgrP4qWPrX3GqvgdTQaELqytXKiP3ryg)
 - Developed a web-app that connects with youtube, accesses the comments of videos and deletes (rejects) toxic comments using FastAPI Framework.
 - Used Google OAuth 2.0 and YouTube Data API to authorize and get access to youtube channel.
 - Created various views (web-pages) that helps user to navigate through the web-app.
